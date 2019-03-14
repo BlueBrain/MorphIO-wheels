@@ -1,0 +1,118 @@
+env:
+    global:
+        - REPO_DIR=MorphIO
+        # Commit from your-project that you want to build
+        - BUILD_COMMIT=HEAD
+        # pip dependencies to _build_ your project
+        - BUILD_DEPENDS="numpy"
+        # pip dependencies to _test_ your project.  Include any dependencies
+        # that you need, that are also specified in BUILD_DEPENDS, this will be
+        # a separate install.
+        - TEST_DEPENDS="numpy nose"
+        - PLAT=x86_64
+        - UNICODE_WIDTH=32
+        - DOCKER_IMAGE=bluebrain/morphio_wheel
+
+language: python
+# The Travis Python version is unrelated to the version we build and test
+# with.  This is set with the MB_PYTHON_VERSION variable.
+python: 3.5
+dist: trusty
+services: docker
+
+jobs:
+  exclude:
+    # Exclude the default Python 3.5 build
+    - python: 3.5
+  include:
+    - os: linux
+      env: MB_PYTHON_VERSION=2.7
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=2.7
+        - UNICODE_WIDTH=16
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=2.7
+        - PLAT=i686
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=2.7
+        - PLAT=i686
+        - UNICODE_WIDTH=16
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=3.4
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=3.4
+        - PLAT=i686
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=3.5
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=3.5
+        - PLAT=i686
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=3.6
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=3.6
+        - PLAT=i686
+    - os: osx
+      language: generic
+      env:
+        - MB_PYTHON_VERSION=2.7
+    - os: osx
+      language: generic
+      env:
+        - MB_PYTHON_VERSION=3.4
+    - os: osx
+      language: generic
+      env:
+        - MB_PYTHON_VERSION=3.5
+    - os: osx
+      language: generic
+      env:
+        - MB_PYTHON_VERSION=3.6
+    - os: osx
+      language: generic
+      env:
+        - MB_PYTHON_VERSION=pypy-5.7
+
+before_install:
+    - source multibuild/common_utils.sh
+    - source multibuild/travis_steps.sh
+    - clean_code $REPO_DIR $BUILD_COMMIT
+    - before_install
+
+install:
+    # Maybe get and clean and patch source
+    - build_wheel $REPO_DIR $PLAT
+
+script:
+    - install_run $PLAT
+
+after_success:
+    # Copy compiled wheels to dist/ where Travis `dpl` tool can find them and
+    # upload to PyPI
+    - pwd
+    - ls -lrt
+    - mkdir -p dist; cp ${TRAVIS_BUILD_DIR}/wheelhouse/*.whl dist
+    - python setup.py sdist
+
+# Deploy to PyPI on tags. Since the hard work of building wheels is already
+# done, we need to defeat some of Travis' automation.
+# Inspired from:
+# https://github.com/madig/freetype-py/blob/bc944ef10a5648b88b25819e12de9853470f53de/.travis.yml
+deploy:
+  provider: pypi
+  on:
+    tags: true
+  user: bbp.opensource
+  password:
+    secure: "NOG3l23fl5xPlLr9z2Yeya8wSEk2W0Vve9iWWCw5isvMIqU3V+SOqLl77Da6CSjVZJIHnoAf5/YLAHSdOLw/+eCv0KYwRfNtCtom09mKbuMFs21uOFQ/oSNgRfLkg6EU1wxW7pwjtoGrjFxVFOP3y/ZzZK6YAwvm0g8M0z8H5Qi4tsUy3cxQIw9Cl1YD4w5Nm2BOJNYq82d7Z32I+Wuj6/pVtuTpX6/TES/FyQSkaA6WxYhmCQavExnVjyeUGCmu3mBHbX9u+7fFpGpCN5ikPT1JbGFucaq8JSwdgsmommY+c8CdDR0c8+usFasWYkp78OKxuFU/toIdIZEOewAOZp5PVHuvNRSziw6Ldn3EdWCN3LyQazwPzBX70aq4Tm69EsEsfnS3x7Qr3nFei3sKpn7Us+5YXq3X2xJV/oMf5Zcx1gsQuqSajCiTeTxBzrKkAOVKBrI5qpnaqj5D6CUy8/VTYZXYESpT+oBoSBHdfTFQjQFyDgAXZYOSl6+zzKX6p7bMQFeBSByAKd82pRq25gzNM0geWUq5UfqrTfYt88+GnP7YwnZBVTLVzpb9BdnPp4mxSO+iODjWj3CQUD24a9TZ3zEARAXGBTxRURG97QX8mghy37/MnYblAvggPuxN/sfAK7qRqiTyBGrkArLgQN0gFXgmy8p62olVKvzm9Ak="
+  skip_cleanup: true  # Prevent deletion of dist/*.
+  distributions: check  # Dummy argument so dists aren't rebuilt by dpl.
