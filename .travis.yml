@@ -1,18 +1,21 @@
 env:
-    global:
-        - REPO_DIR=MorphIO
-        # Commit from your-project that you want to build
-        - BUILD_COMMIT=HEAD
-        # pip dependencies to _build_ your project
-        - BUILD_DEPENDS="numpy"
-        # pip dependencies to _test_ your project.  Include any dependencies
-        # that you need, that are also specified in BUILD_DEPENDS, this will be
-        # a separate install.
-        - TEST_DEPENDS="numpy nose"
-        - PLAT=x86_64
-        - UNICODE_WIDTH=32
-        - DOCKER_IMAGE=bluebrain/morphio_wheel:x86_64
-        - WHEELHOUSE_UPLOADER_USERNAME=travis-worker
+  global:
+    - REPO_DIR=MorphIO
+    # Commit from your-project that you want to build
+    - BUILD_COMMIT=HEAD
+    # pip dependencies to _build_ your project
+    - BUILD_DEPENDS="numpy"
+    # pip dependencies to _test_ your project.  Include any dependencies
+    # that you need, that are also specified in BUILD_DEPENDS, this will be
+    # a separate install.
+    - TEST_DEPENDS="numpy nose"
+    - PLAT=x86_64
+    - UNICODE_WIDTH=32
+    - DOCKER_IMAGE=bluebrain/morphio_wheel:x86_64
+    - WHEELHOUSE_UPLOADER_USERNAME=travis-worker
+  password:
+    secure: "MqLdYrwlHoMJO3OCYSOAIMSpTYzMHIHk32OhCh1Zl4FzhcTgQPIiuN6rpO8EmNX+cHTVectAdRGtFg3qCWDSV/S7GCRHeyNvEQE6cCCIpDgZ10WUBD39nI6CPl5Xw1bVaGy3Z0VVnU57EA86NKSzvvqQUj4Wa9fQk/doeul0dIehzTyepce5BC4gbIUsuRwmAjVwwH8yvqppF5PDsVk/3rEwQ7GgWp/TUTDvt8m8NXB8Yjnr03tsRvHUPKMCIFEfLUIwobtJ/p6iWhoHiRxrrX88G3tHrV5BPmXPIOzYtayBLj+YfKwPfN7lxGeoY1D0AdW9LKPmC6aBmKNwcWAD5tK9VFPTIODALX3p2AOi1re55JQF2EzEjKjWopS08QNI4u/nb29PtCHCeHtZD9huC1O/LGB1SyRtDYTVa1D+zBU8xADAvjbfurNKP4tIL5Klk2YgtcGZE/rlzY+M8K9EI85iBdFqZf8slnTu756nDQ08qE9y0a/V/nPPPVzyOPfxbCjcK3gxjksj7beJWgbYRhMEQ7P51NLVr3ZP+CDZBw+r6GroHGbdSZyWlHogZ+zqJX6LXPVM/t+doXzlpSidMLrZb2Ck/59Z59sYs00QzemzDcSvgevxtG7G37X4ME60e8oURbgPFeMmboFCib87Y0sJ3yuktfTr9pobHQ0ZS5QDHA="
+
 
 language: python
 # The Travis Python version is unrelated to the version we build and test
@@ -20,6 +23,8 @@ language: python
 python: 3.5
 dist: trusty
 services: docker
+
+
 
 jobs:
   exclude:
@@ -102,11 +107,13 @@ script:
     - install_run $PLAT
 
 after_success:
+
     # Copy compiled wheels to dist/ where Travis `dpl` tool can find them and
     # upload to PyPI
     - pwd
     - ls -lrt
     - mkdir -p dist; cp ${TRAVIS_BUILD_DIR}/wheelhouse/*.whl dist
+    - twine upload -u bbp.opensource -p ${password} --repository-url https://test.pypi.org/legacy/ dist/*
 
     # - python setup.py sdist
 
@@ -114,11 +121,11 @@ after_success:
 # done, we need to defeat some of Travis' automation.
 # Inspired from:
 # https://github.com/madig/freetype-py/blob/bc944ef10a5648b88b25819e12de9853470f53de/.travis.yml
-deploy:
-  provider: pypi
-  user: bbp.opensource
-  password:
-    secure: "MqLdYrwlHoMJO3OCYSOAIMSpTYzMHIHk32OhCh1Zl4FzhcTgQPIiuN6rpO8EmNX+cHTVectAdRGtFg3qCWDSV/S7GCRHeyNvEQE6cCCIpDgZ10WUBD39nI6CPl5Xw1bVaGy3Z0VVnU57EA86NKSzvvqQUj4Wa9fQk/doeul0dIehzTyepce5BC4gbIUsuRwmAjVwwH8yvqppF5PDsVk/3rEwQ7GgWp/TUTDvt8m8NXB8Yjnr03tsRvHUPKMCIFEfLUIwobtJ/p6iWhoHiRxrrX88G3tHrV5BPmXPIOzYtayBLj+YfKwPfN7lxGeoY1D0AdW9LKPmC6aBmKNwcWAD5tK9VFPTIODALX3p2AOi1re55JQF2EzEjKjWopS08QNI4u/nb29PtCHCeHtZD9huC1O/LGB1SyRtDYTVa1D+zBU8xADAvjbfurNKP4tIL5Klk2YgtcGZE/rlzY+M8K9EI85iBdFqZf8slnTu756nDQ08qE9y0a/V/nPPPVzyOPfxbCjcK3gxjksj7beJWgbYRhMEQ7P51NLVr3ZP+CDZBw+r6GroHGbdSZyWlHogZ+zqJX6LXPVM/t+doXzlpSidMLrZb2Ck/59Z59sYs00QzemzDcSvgevxtG7G37X4ME60e8oURbgPFeMmboFCib87Y0sJ3yuktfTr9pobHQ0ZS5QDHA="
-  verbose: true
-  skip_cleanup: true  # Prevent deletion of dist/*.
-  distributions: check  # Dummy argument so dists aren't rebuilt by dpl.
+# deploy:
+#   provider: pypi
+#   user: bbp.opensource
+#   password:
+#     secure: "MqLdYrwlHoMJO3OCYSOAIMSpTYzMHIHk32OhCh1Zl4FzhcTgQPIiuN6rpO8EmNX+cHTVectAdRGtFg3qCWDSV/S7GCRHeyNvEQE6cCCIpDgZ10WUBD39nI6CPl5Xw1bVaGy3Z0VVnU57EA86NKSzvvqQUj4Wa9fQk/doeul0dIehzTyepce5BC4gbIUsuRwmAjVwwH8yvqppF5PDsVk/3rEwQ7GgWp/TUTDvt8m8NXB8Yjnr03tsRvHUPKMCIFEfLUIwobtJ/p6iWhoHiRxrrX88G3tHrV5BPmXPIOzYtayBLj+YfKwPfN7lxGeoY1D0AdW9LKPmC6aBmKNwcWAD5tK9VFPTIODALX3p2AOi1re55JQF2EzEjKjWopS08QNI4u/nb29PtCHCeHtZD9huC1O/LGB1SyRtDYTVa1D+zBU8xADAvjbfurNKP4tIL5Klk2YgtcGZE/rlzY+M8K9EI85iBdFqZf8slnTu756nDQ08qE9y0a/V/nPPPVzyOPfxbCjcK3gxjksj7beJWgbYRhMEQ7P51NLVr3ZP+CDZBw+r6GroHGbdSZyWlHogZ+zqJX6LXPVM/t+doXzlpSidMLrZb2Ck/59Z59sYs00QzemzDcSvgevxtG7G37X4ME60e8oURbgPFeMmboFCib87Y0sJ3yuktfTr9pobHQ0ZS5QDHA="
+#   verbose: true
+#   skip_cleanup: true  # Prevent deletion of dist/*.
+#   distributions: check  # Dummy argument so dists aren't rebuilt by dpl.
