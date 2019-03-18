@@ -124,7 +124,9 @@ after_success:
 deploy:
   provider: pypi
   on:
-    branches: test_travis
+    branches:
+      only:
+        - test_travis
 
   user: bbp.opensource
   password:
