@@ -113,6 +113,7 @@ after_success:
     - pwd
     - ls -lrt
     - mkdir -p dist; cp ${TRAVIS_BUILD_DIR}/wheelhouse/*.whl dist
+    - pip install twine
     - twine upload -u bbp.opensource -p ${password} --repository-url https://test.pypi.org/legacy/ dist/*
 
     # - python setup.py sdist
