@@ -1,0 +1,132 @@
+env:
+    global:
+        - REPO_DIR=MorphIO
+        # Commit from your-project that you want to build
+        - BUILD_COMMIT=HEAD
+        # pip dependencies to _build_ your project
+        - BUILD_DEPENDS="numpy"
+        # pip dependencies to _test_ your project.  Include any dependencies
+        # that you need, that are also specified in BUILD_DEPENDS, this will be
+        # a separate install.
+        - TEST_DEPENDS="numpy nose"
+        - PLAT=x86_64
+        - UNICODE_WIDTH=32
+        - DOCKER_IMAGE=bluebrain/morphio_wheel:x86_64
+        - WHEELHOUSE_UPLOADER_USERNAME=travis-worker
+        # Following generated with
+        # travis encrypt -r your-org/your-project-wheels WHEELHOUSE_UPLOADER_SECRET=<the api key>
+        # This is for Rackspace uploads.  Contact Matthew Brett, or the
+        # scikit-learn team, for # permission (and the API key) to upload to
+        # the Rackspace account used here, or use your own account.
+        - secure:
+            "MNKyBWOzu7JAUmC0Y+JhPKfytXxY/ADRmUIMEWZV977FLZPgYctqd+lqel2QIFgdHDO1CIdTSymOOFZckM9ICUXg9Ta+8oBjSvAVWO1ahDcToRM2DLq66fKg+NKimd2OfK7x597h/QmUSl4k8XyvyyXgl5jOiLg/EJxNE2r83IA="
+
+language: python
+# The Travis Python version is unrelated to the version we build and test
+# with.  This is set with the MB_PYTHON_VERSION variable.
+python: 3.5
+dist: trusty
+services: docker
+
+jobs:
+  exclude:
+    # Exclude the default Python 3.5 build
+    - python: 3.5
+  include:
+    - os: linux
+      env: MB_PYTHON_VERSION=2.7
+    # - os: linux
+    #   env:
+    #     - MB_PYTHON_VERSION=2.7
+    #     - UNICODE_WIDTH=16
+    # - os: linux
+    #   env:
+    #     - MB_PYTHON_VERSION=2.7
+    #     - PLAT=i686
+    #     - DOCKER_IMAGE=bluebrain/morphio_wheel:i686
+    # - os: linux
+    #   env:
+    #     - MB_PYTHON_VERSION=2.7
+    #     - PLAT=i686
+    #     - UNICODE_WIDTH=16
+    #     - DOCKER_IMAGE=bluebrain/morphio_wheel:i686
+    # - os: linux
+    #   env:
+    #     - MB_PYTHON_VERSION=3.4
+    # - os: linux
+    #   env:
+    #     - MB_PYTHON_VERSION=3.4
+    #     - PLAT=i686
+    #     - DOCKER_IMAGE=bluebrain/morphio_wheel:i686
+    # - os: linux
+    #   env:
+    #     - MB_PYTHON_VERSION=3.5
+    # - os: linux
+    #   env:
+    #     - MB_PYTHON_VERSION=3.5
+    #     - PLAT=i686
+    #     - DOCKER_IMAGE=bluebrain/morphio_wheel:i686
+    # - os: linux
+    #   env:
+    #     - MB_PYTHON_VERSION=3.6
+    # - os: linux
+    #   env:
+    #     - MB_PYTHON_VERSION=3.6
+    #     - PLAT=i686
+    #     - DOCKER_IMAGE=bluebrain/morphio_wheel:i686
+    # - os: osx
+    #   language: generic
+    #   env:
+    #     - MB_PYTHON_VERSION=2.7
+    # - os: osx
+    #   language: generic
+    #   env:
+    #     - MB_PYTHON_VERSION=3.4
+    # - os: osx
+    #   language: generic
+    #   env:
+    #     - MB_PYTHON_VERSION=3.5
+    # - os: osx
+    #   language: generic
+    #   env:
+    #     - MB_PYTHON_VERSION=3.6
+    # - os: osx
+    #   language: generic
+    #   env:
+    #     - MB_PYTHON_VERSION=pypy-5.7
+
+before_install:
+    - source multibuild/common_utils.sh
+    - source multibuild/travis_steps.sh
+    - clean_code $REPO_DIR $BUILD_COMMIT
+    - before_install
+
+install:
+    # Maybe get and clean and patch source
+    - build_wheel $REPO_DIR $PLAT
+
+script:
+    - install_run $PLAT
+
+after_success:
+    # Copy compiled wheels to dist/ where Travis `dpl` tool can find them and
+    # upload to PyPI
+    - pwd
+    - ls -lrt
+    - mkdir -p dist; cp ${TRAVIS_BUILD_DIR}/wheelhouse/*.whl dist
+
+    # - python setup.py sdist
+
+# Deploy to PyPI on tags. Since the hard work of building wheels is already
+# done, we need to defeat some of Travis' automation.
+# Inspired from:
+# https://github.com/madig/freetype-py/blob/bc944ef10a5648b88b25819e12de9853470f53de/.travis.yml
+deploy:
+  provider: pypi
+  on:
+    tags: true
+  user: bbp.opensource
+  password:
+    secure: "MqLdYrwlHoMJO3OCYSOAIMSpTYzMHIHk32OhCh1Zl4FzhcTgQPIiuN6rpO8EmNX+cHTVectAdRGtFg3qCWDSV/S7GCRHeyNvEQE6cCCIpDgZ10WUBD39nI6CPl5Xw1bVaGy3Z0VVnU57EA86NKSzvvqQUj4Wa9fQk/dl0dIehzTyepce5BC4gbIUsuRwmAjVwwH8yvqppF5PDsVk/3rEwQ7GgWp/TUTDvt8m8NXB8Yjnr03tsRvHUPKMCIFEfLUIwobtJ/p6iWhoHiRxrrX88G3tHrV5BPmXPIOzYtayBLj+YfKwPfN7lxGeoY1D0AdW9LKPmC6aBmKNwcWAD5tK9VFPTIODALX3p2AOi1re55JQF2EzEjKjWopS08QNI4u/nb29PtCHCeHtZD9huC1O/LGB1SyRtDYTVa1D+zBU8xADAvjbfurNKP4tIL5Klk2YgtcGZE/rlzY+M8K9EI85iBdFqZf8slnTu756nDQ08qE9y0a/V/nPPPVzyOPfxbCjcK3gxjksj7beJWgbYRhMEQ7P51NLVr3ZP+CDZBw+r6GroHGbdSZyWlHogZ+zqJX6LXPVM/t+doXzlpSidMLrZb2Ck/59Z59sYs00QzemzDcSvgevxtG7G37X4ME60e8oURbgPFeMmboFCib87Y0sJ3yuktfTr9pobHQ0ZS5QDHA="
+  skip_cleanup: true  # Prevent deletion of dist/*.
+  distributions: check  # Dummy argument so dists aren't rebuilt by dpl.

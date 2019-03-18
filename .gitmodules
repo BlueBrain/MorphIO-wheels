@@ -1,6 +1,6 @@
 [submodule "multibuild"]
 	path = multibuild
-	url = https://github.com/matthew-brett/multibuild.git
+	url = https://github.com/wizmer/multibuild.git
 [submodule "MorphIO"]
 	path = MorphIO
 	url = https://github.com/BlueBrain/MorphIO.git
