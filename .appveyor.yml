@@ -43,9 +43,13 @@ environment:
 platform:
     - x64
 
+image: Visual Studio 2017
+
 matrix:
     fast_finish: true
 
+# By default appveyor does not clone with --recursive
+# so we override the clone step
 clone_script:
     - cmd: git clone -q --recursive --branch=%APPVEYOR_REPO_BRANCH% https://github.com/%APPVEYOR_REPO_NAME%.git %APPVEYOR_BUILD_FOLDER%
     - cmd: git checkout -qf %APPVEYOR_REPO_COMMIT%
@@ -78,9 +82,6 @@ build_script:
 
     # build wheel:
     - cd %REPO_DIR%
-    - dir
-    - pwd
-    - echo %REPO_DIR%
     - git checkout %BUILD_COMMIT%
     - python setup.py bdist_wheel
     - ls dist/*
