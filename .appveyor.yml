@@ -65,6 +65,9 @@ build_script:
 
     # build wheel:
     - cd %REPO_DIR%
+    - dir
+    - pwd
+    - echo "Repo dir: " %REPO_DIR%
     - git checkout %BUILD_COMMIT%
     - python setup.py bdist_wheel
     - ls dist/*
