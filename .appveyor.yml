@@ -69,9 +69,11 @@ build_script:
 
     # Build HDF5
     - curl -OL https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.17/src/hdf5-1.8.17.tar.bz2 && tar xfj hdf5-1.8.17.tar.bz2
-    - cd hdf5-1.8.17 && .\configure CFLAGS=-fPIC CXXFLAGS=-fPIC --prefix=/usr/local --with-pic --disable-shared --with-zlib=/usr/include/,/usr/lib64/ && make -j2 install && cd ..
+    - cd hdf5-1.8.17
+    - dir
+    - .\configure CFLAGS=-fPIC CXXFLAGS=-fPIC --prefix=/usr/local --with-pic --disable-shared --with-zlib=/usr/include/,/usr/lib64/ && make -j2 install && cd ..
     - pwd
-    
+
 
 
     # build wheel:
