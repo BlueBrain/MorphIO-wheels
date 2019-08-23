@@ -51,26 +51,18 @@ jobs:
         - DOCKER_IMAGE=bluebrain/morphio_wheel:i686
     - os: linux
       env:
-        - MB_PYTHON_VERSION=3.4
-    - os: linux
-      env:
-        - MB_PYTHON_VERSION=3.4
-        - PLAT=i686
-        - DOCKER_IMAGE=bluebrain/morphio_wheel:i686
-    - os: linux
-      env:
-        - MB_PYTHON_VERSION=3.5
-    - os: linux
-      env:
-        - MB_PYTHON_VERSION=3.5
-        - PLAT=i686
-        - DOCKER_IMAGE=bluebrain/morphio_wheel:i686
-    - os: linux
-      env:
         - MB_PYTHON_VERSION=3.6
     - os: linux
       env:
         - MB_PYTHON_VERSION=3.6
+        - PLAT=i686
+        - DOCKER_IMAGE=bluebrain/morphio_wheel:i686
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=3.7
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=3.7
         - PLAT=i686
         - DOCKER_IMAGE=bluebrain/morphio_wheel:i686
     - os: osx
@@ -80,15 +72,11 @@ jobs:
     - os: osx
       language: generic
       env:
-        - MB_PYTHON_VERSION=3.4
-    - os: osx
-      language: generic
-      env:
-        - MB_PYTHON_VERSION=3.5
-    - os: osx
-      language: generic
-      env:
         - MB_PYTHON_VERSION=3.6
+    - os: osx
+      language: generic
+      env:
+        - MB_PYTHON_VERSION=3.7
     - os: osx
       language: generic
       env:
