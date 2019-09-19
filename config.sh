@@ -1,24 +1,21 @@
-function build_cmake {
-    if [ -n "$IS_OSX" ]; then
-        PREFIX=$HOME/.local
-    else
-        PREFIX=$BUILD_PREFIX
-    fi
-    echo "build prefix: $BUILD_PREFIX"
-    echo "prefix: $PREFIX"
+set -x
 
-    curl -OL https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz \
-        && tar xfz cmake-3.7.2.tar.gz \
-        && pushd cmake-3.7.2 \
-        && ./configure --prefix=$PREFIX \
-        && make -j4 install \
-        && popd
+function build_cmake {
+    build_simple cmake 3.7.2 https://cmake.org/files/v3.7/
 }
 
 function pre_build {
     build_cmake
-    build_hdf5 1 8
-    build_bzip2
+    build_hdf5
+    if [ -z "$IS_OSX" ]; then
+        # Add workaround for auditwheel bug:
+        # https://github.com/pypa/auditwheel/issues/29
+        local bad_lib="/usr/local/lib/libhdf5.so"
+        if [ -z "$(readelf --dynamic $bad_lib | grep RUNPATH)" ]; then
+            echo "Patching $bad_lib"
+            patchelf --set-rpath $(dirname $bad_lib) $bad_lib
+        fi
+    fi
 }
 
 function run_tests {
