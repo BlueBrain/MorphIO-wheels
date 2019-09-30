@@ -11,7 +11,6 @@ env:
     - TEST_DEPENDS="numpy nose"
     - PLAT=x86_64
     - UNICODE_WIDTH=32
-    - DOCKER_IMAGE=bluebrain/morphio_wheel:x86_64
     - secure: "tRPEFFcQVv4RzaWgF5/6Mg7TAHlYaHcxg6v5UonHn1JxarhH5VQzvPRLA50SAQKug20XTah15Ae9ki15wu1HIM1x+AVVRiexF7WSmXlQqJBNytLMlzWYEcm86iDcjlHFHn82EWIpZhPDDXR+jRYf2ydpz2KgsiJQJ9mSCwg1no2YMP1Nm1q2SQTOvEm5KN+RVcc2jz9oYKB76GQTvjvqVmnxUqG6c1C9sbfXUlT3y9AUkg5DNxaBRfF8wUROtXkba+nIU5s4GmcKeCq5/JiJVUsyD1X5w9yXz6STwc0huu8EGprKuulcaB8r5+vR/rE0Z76bFOnoTGBiOdGZFx+G6YVsOcZnfXsr7NzHxHg81T0OvPCFV7wkk2FgE4hzvFp13VE9u6Q/xOlIEgC9iDe9EZaKelLgr8VmbJQDjk75hxaNyxDu1K4dWyTydvDzwmPg8GuaJ2d0qajtxDg8OagwGIutIqGXnrTGCHuf0BdBqJFbXGGtzezQqF610kUB4ozcN95HZiD6vHi7JCUzJvhYUn/o4ZfK2a9fVXD310eMQU1epZGDV0TxoKGQeA62RsFca++fgTfqRobyeATFxgjQIIC3WsNYPWSkj92ffE2sUc8xmmE69wbVHK2eDZrIs71hKJME1KYgshf8A4CSjiQG/psJA7EHJlCinyBa0q/Ks+o="
 
 
@@ -42,13 +41,11 @@ jobs:
       env:
         - MB_PYTHON_VERSION=2.7
         - PLAT=i686
-        - DOCKER_IMAGE=bluebrain/morphio_wheel:i686
     - os: linux
       env:
         - MB_PYTHON_VERSION=2.7
         - PLAT=i686
         - UNICODE_WIDTH=16
-        - DOCKER_IMAGE=bluebrain/morphio_wheel:i686
     - os: linux
       env:
         - MB_PYTHON_VERSION=3.6
@@ -56,7 +53,6 @@ jobs:
       env:
         - MB_PYTHON_VERSION=3.6
         - PLAT=i686
-        - DOCKER_IMAGE=bluebrain/morphio_wheel:i686
     - os: linux
       env:
         - MB_PYTHON_VERSION=3.7
@@ -64,7 +60,6 @@ jobs:
       env:
         - MB_PYTHON_VERSION=3.7
         - PLAT=i686
-        - DOCKER_IMAGE=bluebrain/morphio_wheel:i686
     - os: osx
       language: generic
       env:

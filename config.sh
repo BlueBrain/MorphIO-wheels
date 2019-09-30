@@ -1,16 +1,18 @@
-# Define custom utilities
-# Test for macOS with [ -n "$IS_OSX" ]
+function build_cmake {
+    curl -OL https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz \
+        && tar xfz cmake-3.7.2.tar.gz \
+        && cd cmake-3.7.2 \
+        && ./configure \
+        && make -j4 install
+}
 
 function pre_build {
-    # Any stuff that you need to do before you start building the wheels
-    # Runs in the root directory of this repository.
-    if [ -n "$IS_OSX" ]; then
-        build_hdf5
-    fi
+    build_cmake
+    build_hdf5 1 8
+    build_bzip2
 }
 
 function run_tests {
-    # Runs tests on installed distribution from an empty directory
     python --version
     python -c 'import sys; import morphio; print(morphio.version)'
 }
