@@ -59,6 +59,7 @@ jobs:
       env:
         - MB_PYTHON_VERSION=3.8
         - PLAT=i686
+
     - os: osx
       language: generic
       env:
