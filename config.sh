@@ -5,7 +5,9 @@ function build_cmake {
 }
 
 function build_libs {
-    build_cmake
+    if [ -z "$IS_OSX" ]; then
+        build_cmake
+    fi
     build_hdf5
 }
 
