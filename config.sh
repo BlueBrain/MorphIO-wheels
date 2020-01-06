@@ -1,9 +1,10 @@
 function build_cmake {
     curl -OL https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz \
         && tar xfz cmake-3.7.2.tar.gz \
-        && cd cmake-3.7.2 \
+        && pushd cmake-3.7.2 \
         && ./configure \
-        && make -j4 install
+        && make -j4 install \
+        && popd
 }
 
 function pre_build {
