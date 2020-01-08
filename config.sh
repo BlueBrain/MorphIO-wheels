@@ -1,8 +1,9 @@
 function build_cmake {
+    echo "build prefix: $BUILD_PREFIX"
     curl -OL https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz \
         && tar xfz cmake-3.7.2.tar.gz \
         && pushd cmake-3.7.2 \
-        && ./configure \
+        && ./configure --prefix=$BUILD_PREFIX \
         && make -j4 install \
         && popd
 }
