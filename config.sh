@@ -17,7 +17,8 @@ function pre_build {
             patchelf --set-rpath $(dirname $bad_lib) $bad_lib
         fi
     else
-        brew install cmake hdf5
+        brew list cmake || brew install cmake
+        brew list hdf5 || brew install hdf5
     fi
 }
 
