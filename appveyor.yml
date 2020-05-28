@@ -1,0 +1,84 @@
+# CI on Windows via appveyor
+image: Visual Studio 2017
+environment:
+  global:
+    REPO_DIR: MorphIO
+    PACKAGE_NAME: morphio
+    BUILD_DEPENDS: "hdf5"
+    MORPHIO_CMAKE_GENERATOR: "Visual Studio 15 2017 Win64"
+    PYPI_USERNAME: bbp.opensource
+    PYPI_SECRET:
+      secure: kXA3jQIiYxHundTVDkXhZD+cs4ggdxUo6eZDhx6ITiCFYhTWX+qR6Hj5Vn1elqFSa8pQjJzsSBzxFJDJVKah5jiRX50rkRHX3UhCSQDbsmWdrmEGf1rT6BRsXzf5zeKRQecPzH+hbIlOMiFXKQasqJsIuEehIk56/mu2XjYJwBp7r8JiqzCpAUFMvqA0YmZJbd5AiQhGwNNrIBgXZxe9JvElrBIdU0DEQwdHMnvBX80aX+cKKIrMqMB2oxefumeM9gWcMU2wese2X2HSAk4stHeSmG6jQhl8iSR1uwbGxz1HWUMj1dwyGKKz8UTKzU85yiPgwT/CbQ2Xi6EPRg19xO7lhYa3oVKvnhhF8XUyBlz4uCssRugwsAa/ETdc8DfVcoN9Df3kjPSi3gF+JOwBfpJxFFmyqugLTqaQC6DaEYbvvWOOiYZcedfFVaDCNXK0kT2CDttbGHOwlVY0vstAlZDoJtb5nPTRGedHXX92BjmJHpbVDicvOS7HvMpOha5ZBtHdheipmXbt1l+AwNpCFyeca23cNZTM8jmuUEqgUsCKBN+Ti7uS5Vktd7bpVDY69YEmtug2EN5mG8Jbohgj5EMfAHwbsU4BHbJeBdy+xdiR7d5VD1/Zp8/dLXxJGVU4rQmSGFzMjDkdJUXZeK9DandyXRtdHgwIhdnr1hs=
+
+  matrix:
+    - PYTHON: "C:\\Miniconda36-x64"
+      PYTHON_VERSION: "3.6"
+      PYTHON_ARCH: "64"
+    - PYTHON: "C:\\Miniconda37-x64"
+      PYTHON_VERSION: "3.7"
+      PYTHON_ARCH: "64"
+
+matrix:
+    fast_finish: true
+
+platform:
+    - x64
+
+install:
+    # Fetch submodules
+    - git submodule update --init --recursive
+
+    - SET PATH=%PYTHON%;%PYTHON%\Scripts;%PYTHON%\Library\bin;%PATH%
+    - conda info
+
+    # Check that we have the expected version and architecture for Python
+    - python --version
+    - python -c "import struct; print(struct.calcsize('P') * 8)"
+
+
+build_script:
+   # - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
+    # Fix MSVC builds for 64-bit Python. See:
+    # http://stackoverflow.com/questions/32091593/cannot-install-windows-sdk-7-1-on-windows-10
+    # - echo "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 > "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64/vcvars64.bat"
+
+    # Install build requirements
+    - conda create --yes -n build_env python=%PYTHON_VERSION% %BUILD_DEPENDS%
+    - activate build_env
+
+    # Additional pre install steps:
+    - set HDF5_DIR=%CONDA_PREFIX%\Library\
+    - set LIBRARY_PATH=%HDF5_DIR%\lib
+    - SET PATH=%HDF5_DIR%\lib;%PATH%
+
+    # build wheel:
+    - cd %REPO_DIR%
+    - git checkout %BUILD_COMMIT%
+    - python setup.py bdist_wheel
+    - cd ..
+
+
+test_script:
+    # create test env
+    - virtualenv --python %PYTHON%\Python.exe test_env
+    - test_env\Scripts\activate.bat
+    - where python
+    - python -m pip install -r %REPO_DIR%\tests\requirement_tests.txt
+
+    # install from wheel
+    - python -m pip install --pre --no-index --find-links %REPO_DIR%\dist\ %PACKAGE_NAME%
+
+    # Change into an innocuous directory and find tests from installation
+    - python --version
+    - python -c "import morphio; print(morphio.version)"
+    - echo %PATH%
+    - nosetests %REPO_DIR%\tests --exclude test_write_basic
+
+artifacts:
+    - path: "%REPO_DIR%\\dist\\*"
+
+on_success:
+  - python -m pip install twine
+  - python -c "import os; print(os.getenv('PYPI_SECRET') is None)"
+  - python -c "import os; print(os.getenv('PYPI_SECRET') == '')"
+  - twine upload -u %PYPI_USERNAME% -p %PYPI_SECRET% --repository-url https://test.pypi.org/legacy/ %REPO_DIR%\\dist\* --verbose
