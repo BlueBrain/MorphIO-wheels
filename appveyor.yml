@@ -52,9 +52,11 @@ build_script:
     - cd %REPO_DIR%
     - git checkout %BUILD_COMMIT%
     - python setup.py bdist_wheel
-    - python -m pip install h5py
-    - python delocate.py dist\*
     - cd ..
+
+    # Add hdf5.dll (taken from h5py) to the wheel
+    - python -m pip install h5py
+    - python delocate.py %REPO_DIR%\\dist\*
 
 
 test_script:
