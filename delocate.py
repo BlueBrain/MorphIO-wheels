@@ -8,7 +8,7 @@ def delocate_hdf5():
     if not hdf5_lib.exists():
         raise Exception(f'{hdf5_lib} not found !')
 
-    morphio_src = Path('MorphIO', 'src')
+    morphio_src = Path('MorphIO', 'morphio')
     if not morphio_src.exists():
         raise Exception(f'{hdf5_lib} not found !')
     shutil.copy(hdf5_lib, morphio_src)
