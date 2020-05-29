@@ -54,9 +54,8 @@ build_script:
     - python setup.py bdist_wheel
     - cd ..
 
-    # Add hdf5.dll (taken from h5py) to the wheel
-    - python -m pip install h5py
-    - python delocate.py %REPO_DIR%\dist
+    # Add hdf5.dll to the wheel
+    - python delocate.py %REPO_DIR%\dist %HDF5_DIR%\bin
 
 
 test_script:
