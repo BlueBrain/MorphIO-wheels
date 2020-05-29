@@ -5,6 +5,12 @@ import shutil
 
 
 def delocate_hdf5(wheel_folder, dll_folder):
+    '''Add hdf5.dll, zlib.dll and msvcp140.dll to the wheel
+
+    Args:
+        wheel_folder: the folder containing the wheel
+        dll_folder: the folder containing the dlls
+    '''
     if not wheel_folder.exists():
         raise Exception(f'{wheel_folder} not found !')
 
