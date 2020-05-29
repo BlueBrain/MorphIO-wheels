@@ -5,11 +5,11 @@ import shutil
 
 
 def delocate_hdf5(folder, dll_folder):
-    hdf5_lib = Path(dll_folder).parent / 'hdf5.dll'
+    hdf5_lib = Path(dll_folder, 'hdf5.dll')
     if not hdf5_lib.exists():
         raise Exception(f'{hdf5_lib} not found !')
 
-    zlib_lib = Path(dll_folder).parent / 'zlib.dll'
+    zlib_lib = Path(dll_folder, 'zlib.dll')
     if not zlib_lib.exists():
         raise Exception(f'{zlib_lib} not found !')
 
