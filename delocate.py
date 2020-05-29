@@ -15,7 +15,7 @@ def delocate_hdf5(wheel_folder, dll_folder):
             dll_lib = Path(dll_folder, f'{dll}.dll')
             if not dll_lib.exists():
                 raise Exception(f'{dll_lib} not found !')
-            zip.write(hdf5_lib, f'morphio/{dll}.dll')
+            zip.write(dll_lib, f'morphio/{dll}.dll')
 
 if __name__=='__main__':
     if len(sys.argv) < 3:
