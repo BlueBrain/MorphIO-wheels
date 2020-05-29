@@ -51,6 +51,9 @@ build_script:
     - set LIBRARY_PATH=%HDF5_DIR%\lib
     - SET PATH=%HDF5_DIR%\lib;%PATH%
 
+    - python -m pip install h5py
+    - python delocate.py
+
     # build wheel:
     - cd %REPO_DIR%
     - git checkout %BUILD_COMMIT%
