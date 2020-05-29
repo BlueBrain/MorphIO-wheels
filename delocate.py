@@ -1,17 +1,22 @@
 from pathlib import Path
+import zipfile
+import sys
 import shutil
 
 
-def delocate_hdf5():
+def delocate_hdf5(filename):
     import h5py
     hdf5_lib = Path(h5py.__file__).parent / 'hdf5.dll'
     if not hdf5_lib.exists():
         raise Exception(f'{hdf5_lib} not found !')
 
-    morphio_src = Path('MorphIO', 'morphio')
-    if not morphio_src.exists():
-        raise Exception(f'{hdf5_lib} not found !')
-    shutil.copy(hdf5_lib, morphio_src)
+    if not filename.exists():
+        raise Exception(f'{filename} not found !')
+
+    with zipfile.ZipFile(filename,'a') as zip:
+        zip.write(hdf5_lib, 'morphio/hdf5.dll')
 
 if __name__=='__main__':
-    delocate_hdf5()
+    if len(sys.argv) < 2:
+        raise Exception('Missing argument WHEELNAME')
+    delocate_hdf5(Path(sys.argv[1]))

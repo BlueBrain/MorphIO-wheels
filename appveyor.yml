@@ -11,9 +11,6 @@ environment:
       secure: kXA3jQIiYxHundTVDkXhZD+cs4ggdxUo6eZDhx6ITiCFYhTWX+qR6Hj5Vn1elqFSa8pQjJzsSBzxFJDJVKah5jiRX50rkRHX3UhCSQDbsmWdrmEGf1rT6BRsXzf5zeKRQecPzH+hbIlOMiFXKQasqJsIuEehIk56/mu2XjYJwBp7r8JiqzCpAUFMvqA0YmZJbd5AiQhGwNNrIBgXZxe9JvElrBIdU0DEQwdHMnvBX80aX+cKKIrMqMB2oxefumeM9gWcMU2wese2X2HSAk4stHeSmG6jQhl8iSR1uwbGxz1HWUMj1dwyGKKz8UTKzU85yiPgwT/CbQ2Xi6EPRg19xO7lhYa3oVKvnhhF8XUyBlz4uCssRugwsAa/ETdc8DfVcoN9Df3kjPSi3gF+JOwBfpJxFFmyqugLTqaQC6DaEYbvvWOOiYZcedfFVaDCNXK0kT2CDttbGHOwlVY0vstAlZDoJtb5nPTRGedHXX92BjmJHpbVDicvOS7HvMpOha5ZBtHdheipmXbt1l+AwNpCFyeca23cNZTM8jmuUEqgUsCKBN+Ti7uS5Vktd7bpVDY69YEmtug2EN5mG8Jbohgj5EMfAHwbsU4BHbJeBdy+xdiR7d5VD1/Zp8/dLXxJGVU4rQmSGFzMjDkdJUXZeK9DandyXRtdHgwIhdnr1hs=
 
   matrix:
-    - PYTHON: "C:\\Miniconda36-x64"
-      PYTHON_VERSION: "3.6"
-      PYTHON_ARCH: "64"
     - PYTHON: "C:\\Miniconda37-x64"
       PYTHON_VERSION: "3.7"
       PYTHON_ARCH: "64"
@@ -51,13 +48,12 @@ build_script:
     - set LIBRARY_PATH=%HDF5_DIR%\lib
     - SET PATH=%HDF5_DIR%\lib;%PATH%
 
-    - python -m pip install h5py
-    - python delocate.py
-
     # build wheel:
     - cd %REPO_DIR%
     - git checkout %BUILD_COMMIT%
     - python setup.py bdist_wheel
+    - python -m pip install h5py
+    - python delocate.py dist\*
     - cd ..
 
 
@@ -76,6 +72,7 @@ test_script:
     - python -c "import morphio; print(morphio.version)"
     - echo %PATH%
     - nosetests %REPO_DIR%\tests --exclude test_write_basic
+
 
 artifacts:
     - path: "%REPO_DIR%\\dist\\*"
