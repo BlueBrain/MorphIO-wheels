@@ -56,7 +56,7 @@ build_script:
 
     # Add hdf5.dll (taken from h5py) to the wheel
     - python -m pip install h5py
-    - python delocate.py %REPO_DIR%\\dist\*
+    - python delocate.py %REPO_DIR%\dist
 
 
 test_script:
