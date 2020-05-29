@@ -4,24 +4,18 @@ import sys
 import shutil
 
 
-def delocate_hdf5(folder, dll_folder):
-    hdf5_lib = Path(dll_folder, 'hdf5.dll')
-    if not hdf5_lib.exists():
-        raise Exception(f'{hdf5_lib} not found !')
+def delocate_hdf5(wheel_folder, dll_folder):
+    if not wheel_folder.exists():
+        raise Exception(f'{wheel_folder} not found !')
 
-    zlib_lib = Path(dll_folder, 'zlib.dll')
-    if not zlib_lib.exists():
-        raise Exception(f'{zlib_lib} not found !')
-
-    if not folder.exists():
-        raise Exception(f'{folder} not found !')
-
-
-    filename = next(folder.rglob('*whl'))
+    filename = next(wheel_folder.rglob('*whl'))
     print("filename: {}".format(filename))
     with zipfile.ZipFile(filename,'a') as zip:
-        zip.write(hdf5_lib, 'morphio/hdf5.dll')
-        zip.write(zlib_lib, 'morphio/zlib.dll')
+        for dll in ['zlib', 'hdf5', 'msvcp140']:
+            dll_lib = Path(dll_folder, dll)
+            if not dll_lib.exists():
+                raise Exception(f'{dll_lib} not found !')
+            zip.write(hdf5_lib, f'morphio/{dll}.dll')
 
 if __name__=='__main__':
     if len(sys.argv) < 3:
