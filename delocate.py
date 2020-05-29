@@ -12,7 +12,7 @@ def delocate_hdf5(wheel_folder, dll_folder):
     print("filename: {}".format(filename))
     with zipfile.ZipFile(filename,'a') as zip:
         for dll in ['zlib', 'hdf5', 'msvcp140']:
-            dll_lib = Path(dll_folder, dll)
+            dll_lib = Path(dll_folder, f'{dll}.dll')
             if not dll_lib.exists():
                 raise Exception(f'{dll_lib} not found !')
             zip.write(hdf5_lib, f'morphio/{dll}.dll')
