@@ -26,9 +26,6 @@ platform:
 install:
     # Fetch submodules
     - git submodule update --init --recursive
-    - echo "username"
-    - echo %PYPI_USERNAME%
-
 
     - SET PATH=%PYTHON%;%PYTHON%\Scripts;%PYTHON%\Library\bin;%PATH%
     - conda info
@@ -85,7 +82,4 @@ artifacts:
 
 on_success:
   - python -m pip install twine
-  - echo %PYPI_USERNAME%
-  - python -c "import os; print(os.getenv('PYPI_SECRET') is None)"
-  - python -c "import os; print(os.getenv('PYPI_SECRET') == '')"
   - twine upload -u %PYPI_USERNAME% -p %PYPI_SECRET% --repository-url https://test.pypi.org/legacy/ %REPO_DIR%\\dist\* --verbose
