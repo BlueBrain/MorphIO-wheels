@@ -26,6 +26,9 @@ platform:
 install:
     # Fetch submodules
     - git submodule update --init --recursive
+    - echo "username"
+    - echo %PYPI_USERNAME%
+
 
     - SET PATH=%PYTHON%;%PYTHON%\Scripts;%PYTHON%\Library\bin;%PATH%
     - conda info
